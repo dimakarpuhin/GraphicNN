@@ -3,3 +3,5 @@
 windowWidth=1480 # ширина главного окна в интерфейсе
 windowHeight=800 # высота главного окна в интерфейсе
 
+canvasWidth=1000 # ширина midFrame в интерфейсе
+canvasHeight=770 # высота midFrame в интерфейсе

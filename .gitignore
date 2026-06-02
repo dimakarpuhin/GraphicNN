@@ -1,0 +1,17 @@
+New-Item -Path ".gitignore" -ItemType File -Value @"
+# Виртуальное окружение
+venv/
+__pycache__/
+*.pyc
+
+# Файлы данных (если они большие)
+*.txt
+*.png
+
+# Настройки IDE
+.vscode/
+.idea/
+
+# Отладочные файлы
+*.log
+"@

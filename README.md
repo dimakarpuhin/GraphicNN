@@ -64,3 +64,9 @@ python main.py
 Генерация тестовых данных
 python generate_features.py  Создает признаки (3 класса по 700 примеров)
 python generate_labels.py Создает one-hot метки
+
+Они создадут следующие файлы:
+train_features.txt (обучающие признаки)
+test_features.txt (тестовые признаки)
+train_labels.txt (обучающие метки)
+test_labels.txt (тестовые метки)

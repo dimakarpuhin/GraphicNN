@@ -592,7 +592,7 @@ class NeuralNetwork:
         # Инициализируем веса и смещения
         self.randomWeights(listNodeValues)
         self.randomBias(listNodeValues)
-        
+
         self.view.statusbar["text"] = "Нейросеть создана!"
     
     def saveNetwork(self, filename):

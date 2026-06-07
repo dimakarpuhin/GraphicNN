@@ -370,11 +370,114 @@ class View:
         self.statusbar.config(text="Готов. Выберите параметры нейросети и нажмите 'Создать нейросеть'")
     
     # ==================== МЕТОДЫ-ЗАГЛУШКИ (ДОЛЖНЫ БЫТЬ РЕАЛИЗОВАНЫ) ====================
-    
+      
     def create_network(self):
         """Создает нейросеть на основе выбранных параметров."""
         if self.controller:
+            # Получаем параметры из интерфейса
+            input_size = int(self.combo1input.get())
+            hidden1 = int(self.combo2layer1.get())
+            hidden2 = int(self.combo3layer2.get())
+            hidden3 = int(self.combo4layer3.get())
+            output_size = int(self.combo5output.get())
+            
+            # Передаём параметры в контроллер
+            self.controller.numInput = input_size
+            self.controller.numOutput = output_size
+            self.controller.numOfHLayers = []
+            if hidden1 > 0:
+                self.controller.numOfHLayers.append(hidden1)
+            if hidden2 > 0:
+                self.controller.numOfHLayers.append(hidden2)
+            if hidden3 > 0:
+                self.controller.numOfHLayers.append(hidden3)
+            
+            # Создаём веса в контроллере
             self.controller.create_network()
+            
+            # Рисуем нейросеть на холсте
+            self.draw_network()    
+            
+
+    def draw_network(self):
+        """Рисует нейросеть на холсте."""
+        # Очищаем холст
+        self.c.delete("all")
+        
+        # Очищаем списки
+        self.listInputNode.clear()
+        self.listOutputNode.clear()
+        self.listHiddenNodes.clear()
+        self.listArrows.clear()
+        
+        # Общее количество слоёв
+        total_layers = 1 + len(self.controller.numOfHLayers) + 1
+        layer_idx = 0
+        
+        # Рисуем входной слой
+        positions = cfg.getNodePosition(total_layers, self.controller.numInput, layer_idx)
+        for pos in positions:
+            node = Node()
+            node.create(self.c, pos[0], pos[1])
+            node.setNodeColor(cfg.inputNColor)
+            self.listInputNode.append(node)
+        layer_idx += 1
+        
+        # Рисуем скрытые слои
+        self.listHiddenNodes = []
+        colors = [cfg.layer1Color, cfg.layer2Color, cfg.layer3Color]
+        for i, hidden_size in enumerate(self.controller.numOfHLayers):
+            positions = cfg.getNodePosition(total_layers, hidden_size, layer_idx)
+            hidden_layer = []
+            for pos in positions:
+                node = Node()
+                node.create(self.c, pos[0], pos[1])
+                if i < len(colors):
+                    node.setNodeColor(colors[i])
+                hidden_layer.append(node)
+            self.listHiddenNodes.append(hidden_layer)
+            layer_idx += 1
+        
+        # Рисуем выходной слой
+        positions = cfg.getNodePosition(total_layers, self.controller.numOutput, layer_idx)
+        for pos in positions:
+            node = Node()
+            node.create(self.c, pos[0], pos[1])
+            node.setNodeColor(cfg.outputNColor)
+            self.listOutputNode.append(node)
+        
+        # Рисуем связи
+        self.draw_connections()
+        
+        self.c.update()
+        self.statusbar.config(text=f"Сеть: {self.controller.numInput}→{self.controller.numOfHLayers}→{self.controller.numOutput}")
+
+
+
+    def draw_connections(self):
+        """Рисует связи между нейронами."""
+        # Собираем все слои
+        all_layers = [self.listInputNode] + self.listHiddenNodes + [self.listOutputNode]
+        
+        # Соединяем соседние слои
+        for layer_idx in range(len(all_layers) - 1):
+            left_layer = all_layers[layer_idx]
+            right_layer = all_layers[layer_idx + 1]
+            
+            for left_node in left_layer:
+                for right_node in right_layer:
+                    start = left_node.getRightCod()
+                    end = right_node.getLeftCod()
+                    
+                    arrow = Arrow()
+                    arrow.create(self.c, start, end)
+                    arrow.updateWeight(0.0)
+                    
+                    left_node.addRightArrow(arrow)
+                    right_node.addLeftArrow(arrow)
+                    self.listArrows.append(arrow)
+        
+      
     
     def load_train_features(self):
         """Загружает обучающие признаки."""
